@@ -1,0 +1,355 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>使用 GitHub Actions 自动部署 Hexo | 梦钟小屋</title><meta name="author" content="Trying Chung"><meta name="copyright" content="Trying Chung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#e8f5e9"><meta name="description" content="Hexo 是一款高效便捷的静态博客框架，但每次更新文章后手动生成静态文件并部署到 GitHub Pages 可能会有些繁琐。 借助 GitHub Actions 工具，我们可以实现自动化部署，解放双手。 部署到 Github Pages 的常用方式是 Hexo 官方推荐的 hexo-deployer-git 一键部署 本文则是通过编写自定义的 GitHub Actions 工作流配置文件（如 d">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 GitHub Actions 自动部署 Hexo">
+<meta property="og:url" content="https://trying-c.github.io/posts/24967/index.html">
+<meta property="og:site_name" content="梦钟小屋">
+<meta property="og:description" content="Hexo 是一款高效便捷的静态博客框架，但每次更新文章后手动生成静态文件并部署到 GitHub Pages 可能会有些繁琐。 借助 GitHub Actions 工具，我们可以实现自动化部署，解放双手。 部署到 Github Pages 的常用方式是 Hexo 官方推荐的 hexo-deployer-git 一键部署 本文则是通过编写自定义的 GitHub Actions 工作流配置文件（如 d">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trying-c.github.io/assets/imgs/cover/2.png">
+<meta property="article:published_time" content="2025-04-24T15:12:37.000Z">
+<meta property="article:modified_time" content="2025-08-08T17:52:06.150Z">
+<meta property="article:author" content="Trying Chung">
+<meta property="article:tag" content="GitHub">
+<meta property="article:tag" content="效率工具">
+<meta property="article:tag" content="Hexo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trying-c.github.io/assets/imgs/cover/2.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "使用 GitHub Actions 自动部署 Hexo",
+  "url": "https://trying-c.github.io/posts/24967/",
+  "image": "https://trying-c.github.io/assets/imgs/cover/2.png",
+  "datePublished": "2025-04-24T15:12:37.000Z",
+  "dateModified": "2025-08-08T17:52:06.150Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Trying Chung",
+      "url": "https://trying-c.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/imgs/tc.ico"><link rel="canonical" href="https://trying-c.github.io/posts/24967/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#031f05')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#e8f5e9')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '使用 GitHub Actions 自动部署 Hexo',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/assets/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/assets/imgs/bg.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/imgs/ooc.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">梦钟小屋</span></a><a class="nav-page-title" href="/"><span class="site-name">使用 GitHub Actions 自动部署 Hexo</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">使用 GitHub Actions 自动部署 Hexo</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2025-04-24T15:12:37.000Z" title="发表于 2025-04-24 23:12:37">2025-04-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GitHub/">GitHub</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">910</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><ul>
+<li>Hexo 是一款高效便捷的静态博客框架，但每次更新文章后手动生成静态文件并部署到 GitHub Pages 可能会有些繁琐。</li>
+<li>借助 <strong>GitHub Actions</strong> 工具，我们可以实现自动化部署，解放双手。</li>
+<li>部署到 Github Pages 的常用方式是 <strong>Hexo</strong> 官方推荐的 <code>hexo-deployer-git</code> 一键部署</li>
+<li>本文则是通过编写自定义的 <strong>GitHub Actions</strong> 工作流配置文件（如 <code>deploy.yml</code>）去完成静态网页的生成并将其推送到分支后触发 <strong>Github Pages</strong> 的部署。</li>
+</ul>
+<hr>
+<h2 id="官方推荐的一键部署"><a href="#官方推荐的一键部署" class="headerlink" title="官方推荐的一键部署"></a>官方推荐的一键部署</h2><p>Hexo 官方提供了 <code>hexo-deployer-git</code> 插件，只需在 Hexo 的配置文件 <code>_config.yml</code> 中添加以下配置：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">https://github.com/用户名/仓库名.git</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">gh-pages</span></span><br></pre></td></tr></table></figure>
+
+<p>然后在命令行中执行 <code>hexo clean &amp;&amp; hexo deploy</code>，插件会自动将生成的静态文件推送到 <code>gh-pages</code> 分支。这种方式简单快捷，适合需要基础功能的用户。</p>
+<hr>
+<h2 id="自定义-GitHub-Actions-工作流"><a href="#自定义-GitHub-Actions-工作流" class="headerlink" title="自定义 GitHub Actions 工作流"></a>自定义 GitHub Actions 工作流</h2><p>另外也可以通过编写 <code>deploy.yml</code> 文件定义自定义 GitHub Actions 工作流。以下是具体实现步骤：</p>
+<h3 id="1-创建-GitHub-Actions-配置文件"><a href="#1-创建-GitHub-Actions-配置文件" class="headerlink" title="1. 创建 GitHub Actions 配置文件"></a>1. 创建 GitHub Actions 配置文件</h3><p>在项目根目录下新建 <code>.github/workflows/deploy.yml</code> 文件，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Hexo</span> <span class="string">to</span> <span class="string">GitHub</span> <span class="string">Pages</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span> <span class="comment"># 当推送到 main 分支时触发</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="comment"># 步骤1：检出仓库代码</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">repository</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">submodules:</span> <span class="literal">false</span> <span class="comment"># 禁用子模块检查</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># 步骤2：设置 Node.js 环境</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Node.js</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v3</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="string">v20.18.0</span> <span class="comment"># 指定 Node.js 版本 (最好和本地的Node版本一致，减少报错的机率)</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># 步骤3：安装 Hexo 及依赖</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">Dependencies</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">npm</span> <span class="string">install</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># 步骤4：安装 Hexo 部署插件</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">Hexo</span> <span class="string">Git</span> <span class="string">Deployer</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          npm install hexo-deployer-git --save </span></span><br><span class="line"><span class="string">          npm install hexo-cli -g</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">      <span class="comment"># 步骤5：生成静态文件</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Clean</span> <span class="string">and</span> <span class="string">Generate</span> <span class="string">Static</span> <span class="string">Files</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          hexo clean</span></span><br><span class="line"><span class="string">          hexo generate</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">      <span class="comment"># 步骤6：配置 Git 用户信息 (可以按自己喜好自定义)</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">Git</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          git config --global user.name &#x27;github-actions[bot]&#x27;</span></span><br><span class="line"><span class="string">          git config --global user.email &#x27;github-actions[bot]@users.noreply.github.com&#x27;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">      <span class="comment"># 步骤7：部署到 gh-pages 分支</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">to</span> <span class="string">GitHub</span> <span class="string">Pages</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">          <span class="attr">GH_TOKEN:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.GH_TOKEN</span> <span class="string">&#125;&#125;</span> <span class="comment"># 使用 Token 认证</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          cd public/</span></span><br><span class="line"><span class="string">          git init</span></span><br><span class="line"><span class="string">          git add -A</span></span><br><span class="line"><span class="string">          git commit -m &quot;Create by workflows&quot;</span></span><br><span class="line"><span class="string">          git remote add origin https://$&#123;&#123; secrets.GH_TOKEN &#125;&#125;@github.com/trying-c/trying-hexo.git</span></span><br><span class="line"><span class="string">          git push origin HEAD:gh-pages -f</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-配置密钥（GH-TOKEN）"><a href="#2-配置密钥（GH-TOKEN）" class="headerlink" title="2. 配置密钥（GH_TOKEN）"></a>2. 配置密钥（GH_TOKEN）</h3><ol>
+<li>在 GitHub 仓库的 <strong>Settings → Secrets → Actions</strong> 中，新建一个名为 <code>GH_TOKEN</code> 的密钥，值为具有仓库读写权限的 <a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/settings/tokens">Personal Access Token</a>。</li>
+<li>确保仓库的 GitHub Pages 功能已开启，并指定源分支为 <code>gh-pages</code>。<ul>
+<li>进入仓库的 <strong>Settings</strong> → <strong>Pages</strong> 。</li>
+<li>在 <strong>Branch</strong> 选项中选择 <code>gh-pages</code> 分支，并指定根目录（默认为 <code>/ (root)</code>）。</li>
+<li>点击 <strong>Save</strong>，稍等片刻即可通过 https:&#x2F;&#x2F;用户名.github.io&#x2F;仓库名 访问你的博客。</li>
+</ul>
+</li>
+</ol>
+<h3 id="3-触发自动化流程"><a href="#3-触发自动化流程" class="headerlink" title="3. 触发自动化流程"></a>3. 触发自动化流程</h3><p>将代码推送到 <code>main</code> 分支后，GitHub Actions 会自动执行以下操作：</p>
+<ol>
+<li><code>deploy.yml</code>: 安装 Node.js 环境 → 构建 Hexo 项目 → 生成静态文件 → 推送至 <code>gh-pages</code> 分支</li>
+<li>推送至 <code>gh-pages</code>分支后自动生成的工作流: 由 Github Pages 完成网页部署。</li>
+</ol>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>追求快速上手，官方的一键部署完全够用！！（<a href="/posts/9187/" title="两个简化Hexo操作的小脚本">也可以编写便捷的脚本，双击文件解决繁琐的发布操作</a>）</li>
+<li>追求解放双手，自定义 GitHub Actions 工作流会是更好的选择喔~（还能实现 Github 上使用同一仓库完成源码托管和静态部署）</li>
+</ol>
+<p>两种方式最终都通过 GitHub Pages 实现博客托管，读者可以根据实际需求灵活选用。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/GitHub/">GitHub</a><a class="post-meta__tags" href="/tags/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7/">效率工具</a><a class="post-meta__tags" href="/tags/Hexo/">Hexo</a></div><div class="post-share"><div class="social-share" data-image="/assets/imgs/cover/2.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/posts/24432/" title="一次失败的域名托管实践：Cloudns + Cloudflare + GitHub Pages"><img class="cover" src="/assets/imgs/cover/3.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">一次失败的域名托管实践：Cloudns + Cloudflare + GitHub Pages</div></div><div class="info-2"><div class="info-item-1">今天尝试将 Cloudns 的免费域名通过 Cloudflare 托管并 GitHub Pages 中使用，却遭遇了持续失败。不过这个踩坑过程让我进一步理解了 DNS、域名等相关的东西，还是做个记录。  🚧 操作环境 域名注册商：Cloudns（免费套餐） DNS 托管：Cloudflare 静态托管：GitHub Pages 目标：通过自定义域名访问 GitHub Pages  🔄 操...</div></div></div></a><a class="pagination-related" href="/posts/9187/" title="两个简化Hexo操作的小脚本"><img class="cover" src="/assets/imgs/cover/1.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">两个简化Hexo操作的小脚本</div></div><div class="info-2"><div class="info-item-1">初步构建网站时需要经常反复配置并预览网站是否正常显示，命令虽然简单，但反反复复的操作的确让人浮躁。嘻嘻，忽然想到可以写脚本，双击文件解决痛点。 分享两个自己日常使用的脚本文件，能快速完成 Hexo 博客的发布和预览操作。(虽然简单，但有用。记录记录)  核心功能在博客根目录放置这两个文件：  发布.bat：自动完成部署全流程 预览.bat：快速启动本地服务器  文件内容发布.bat@echo...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/posts/9187/" title="两个简化Hexo操作的小脚本"><img class="cover" src="/assets/imgs/cover/1.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-24</div><div class="info-item-2">两个简化Hexo操作的小脚本</div></div><div class="info-2"><div class="info-item-1">初步构建网站时需要经常反复配置并预览网站是否正常显示，命令虽然简单，但反反复复的操作的确让人浮躁。嘻嘻，忽然想到可以写脚本，双击文件解决痛点。 分享两个自己日常使用的脚本文件，能快速完成 Hexo 博客的发布和预览操作。(虽然简单，但有用。记录记录)  核心功能在博客根目录放置这两个文件：  发布.bat：自动完成部署全流程 预览.bat：快速启动本地服务器  文件内容发布.bat@echo...</div></div></div></a><a class="pagination-related" href="/posts/6603/" title="用GitHub Pages搭网站，GitHub Actions自动化真香！"><img class="cover" src="/assets/imgs/cover/4.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-27</div><div class="info-item-2">用GitHub Pages搭网站，GitHub Actions自动化真香！</div></div><div class="info-2"><div class="info-item-1">前面写了一篇关于 GitHub Actions 自动部署 Hexo 博客的文，今天来具体介绍一下 Github Pages 配合 GitHub Actions 部署展示静态页面的使用方法。 GitHub Pages：免费的静态页面托管GitHub Pages 是什么？简单说就是 GitHub 自带的静态网站托管服务，支持 HTML&#x2F;CSS&#x2F;JS，自带 CDN 和 HTTP...</div></div></div></a><a class="pagination-related" href="/posts/24432/" title="一次失败的域名托管实践：Cloudns + Cloudflare + GitHub Pages"><img class="cover" src="/assets/imgs/cover/3.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-25</div><div class="info-item-2">一次失败的域名托管实践：Cloudns + Cloudflare + GitHub Pages</div></div><div class="info-2"><div class="info-item-1">今天尝试将 Cloudns 的免费域名通过 Cloudflare 托管并 GitHub Pages 中使用，却遭遇了持续失败。不过这个踩坑过程让我进一步理解了 DNS、域名等相关的东西，还是做个记录。  🚧 操作环境 域名注册商：Cloudns（免费套餐） DNS 托管：Cloudflare 静态托管：GitHub Pages 目标：通过自定义域名访问 GitHub Pages  🔄 操...</div></div></div></a><a class="pagination-related" href="/posts/38521/" title="为Hexo博客添加Waline评论系统的具体操作步骤"><img class="cover" src="/assets/imgs/cover/1.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-28</div><div class="info-item-2">为Hexo博客添加Waline评论系统的具体操作步骤</div></div><div class="info-2"><div class="info-item-1">最近想把博客的评论系统从无到有搭建起来，最终选择了轻量且支持数据库的 Waline。记录下完整的配置流程，包含服务端部署与前端集成细节。  🚧 操作环境 静态博客框架：Hexo 主题：Butterfly 评论系统：Waline 数据库服务：LeanCloud（免费套餐）   🔧 配置步骤一、准备后端服务1. 注册 LeanCloud 访问 LeanCloud 国际版 创建新应用（如 Bl...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Waline</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="waline-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%98%E6%96%B9%E6%8E%A8%E8%8D%90%E7%9A%84%E4%B8%80%E9%94%AE%E9%83%A8%E7%BD%B2"><span class="toc-number">1.</span> <span class="toc-text">官方推荐的一键部署</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89-GitHub-Actions-%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-number">2.</span> <span class="toc-text">自定义 GitHub Actions 工作流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA-GitHub-Actions-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">2.1.</span> <span class="toc-text">1. 创建 GitHub Actions 配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%85%8D%E7%BD%AE%E5%AF%86%E9%92%A5%EF%BC%88GH-TOKEN%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">2. 配置密钥（GH_TOKEN）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%A7%A6%E5%8F%91%E8%87%AA%E5%8A%A8%E5%8C%96%E6%B5%81%E7%A8%8B"><span class="toc-number">2.3.</span> <span class="toc-text">3. 触发自动化流程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By Trying Chung</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  let initFn = window.walineFn || null
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"locale":{"nick":"昵称","mail":"邮箱","link":"你的网站","placeholder":"留下你的足迹o(*￣▽￣*)ブ （PS:填写数字QQ邮箱可以自动获取QQ头像）","requiredMeta":[],"sofa":"评论区空空如也~呜呜呜","login":"登录(可选)"},"reaction":false,"search":false,"emoji":["//unpkg.com/@waline/emojis@1.2.0/bilibili","//unpkg.com/@waline/emojis@1.2.0/qq","//unpkg.com/@waline/emojis@1.2.0/tieba","//unpkg.com/@waline/emojis@1.2.0/weibo"]}
+
+  const destroyWaline = ele => ele.destroy()
+
+  const initWaline = (Fn, el = document, path = window.location.pathname) => {
+    const waline = Fn({
+      el: el.querySelector('#waline-wrap'),
+      serverURL: 'https://forwaline-vercel-8crt.vercel.app/',
+      pageview: false,
+      dark: 'html[data-theme="dark"]',
+      comment: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || path
+    })
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyWaline = () => {
+        destroyWaline(waline)
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const loadWaline = (el, path) => {
+    if (initFn) initWaline(initFn, el, path)
+    else {
+      btf.getCSS('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.css')
+        .then(() => import('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.js'))
+        .then(({ init }) => {
+          initFn = init || Waline.init
+          initWaline(initFn, el, path)
+          window.walineFn = initFn
+        })
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Waline'
+      ? window.shuoshuoComment = { loadComment: loadWaline } 
+      : window.loadOtherComment = loadWaline
+    return
+  }
+
+  if ('Waline' === 'Waline' || !true) {
+    if (true) btf.loadComment(document.getElementById('waline-wrap'),loadWaline)
+    else setTimeout(loadWaline, 0)
+  } else {
+    window.loadOtherComment = loadWaline
+  }
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"placeholder":"留下你的足迹o(*￣▽￣*)ブ"}
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'UiqS9a0n4lJdFRrqPbrgjpbS-MdYXbMMI',
+      appKey: 'NkeAhjIM8aY4DBSeOIzuQ1qQ',
+      avatar: 'hide',
+      serverURLs: 'https://uiqs9a0n.api.lncldglobal.com',
+      emojiMaps: "",
+      visitor: true,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Waline' === 'Valine' || !true) {
+    if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="输入你想找的关键字吧~" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

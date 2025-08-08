@@ -1,0 +1,16 @@
+html[data-theme=light] {
+    --card-bg: rgba(255, 255, 255, 0.8);
+}
+
+#nav .site-page:not(.child):hover {
+    color: #689f7e !important;
+}
+
+#nav .site-page:not(.child)::after {
+    background-color: #588b6d;
+}
+
+#aside-content .card-announcement .item-headline i {
+    color: #4d7d64;
+    transform: none !important;
+}
