@@ -532,21 +532,21 @@ sharejs:
 
 theme_color:
   enable: true
-  main: "#0a4c0e" # 核心深绿 (松林暗部)
-  paginator: "#0c5c12" # 翡翠矿脉分页
-  button_hover: "#083d0b" # 午夜丛林悬停
-  text_selection: "#052908" # 幽谷选中色
-  link_color: "#0e7a1b" # 新生蕨类链接
-  meta_color: "#4a6d4e" # 青苔灰元数据
-  hr_color: "#2d5c30" # 古柏年轮分隔线
-  code_foreground: "#0fbf2d" # 磷光绿代码
-  code_background: "rgba(225, 245, 228, 0.9)" # 晨雾半透背景
-  toc_color: "#1a5c1f" # 松针目录
-  blockquote_padding_color: "#3d6d41" # 年轮纹路边框
-  blockquote_background_color: "#e8f5e9" # 林间晨光背景
-  scrollbar_color: "#1a5c1f" # 竹节滚动条
-  meta_theme_color_light: "#e8f5e9" # 薄雾绿（含5%主色）
-  meta_theme_color_dark: "#031f05" # 原始雨林（主色加深400%）
+  main: "#343D4E" # 深夜湖光 (主色调，用于主要文本和重要元素，提供高对比度)
+  paginator: "#8A6D7C" # 暮光冰莓 (分页器，柔和而有层次感的粉紫色)
+  button_hover: "#C987A1" # 晨曦映雪 (按钮悬停，更饱和的粉色，提供活泼的反馈)
+  text_selection: "#6B8EAA" # 幽蓝冰面 (文字选中，提供清晰且柔和的选中效果)
+  link_color: "#4F7695" # 冰湖深链 (链接文字，与主色调区分，易于识别)
+  meta_color: "#7E8AA0" # 山峦剪影 (次要信息、元数据，确保在半透明背景下清晰可见)
+  hr_color: "#AABBCD" # 雪野边界 (分隔线，柔和的蓝灰色，区分内容区块)
+  code_foreground: "#343D4E" # 暗影松针 (代码前景色，与主文本色一致，提升可读性)
+  code_background: "rgba(235, 240, 245, 0.9)" # 雪地微光 (代码块背景，保持半透明白色)
+  toc_color: "#7E8AA0" # 目录迷雾 (目录文字，与元数据色相同，保持一致性)
+  blockquote_padding_color: "#8A6D7C" # 冻结岸线 (引用块边框，与分页器同色，增强结构感)
+  blockquote_background_color: "#EBF0F5" # 雪绒反光 (引用块背景，纯净的冷白)
+  scrollbar_color: "#AABBCD" # 冰晶滚动条 (滚动条，提升可见性又不突兀)
+  meta_theme_color_light: "#F0F5F8" # 纯净雪白 (浏览器浅色主题，与背景呼应)
+  meta_theme_color_dark: "#343D4E" # 寂静深渊 (浏览器深色主题，与主色调一致)
 
 # Add a mask to the header and footer
 mask:

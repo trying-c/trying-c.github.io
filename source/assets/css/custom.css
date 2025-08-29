@@ -3,14 +3,22 @@ html[data-theme=light] {
 }
 
 #nav .site-page:not(.child):hover {
-    color: #689f7e !important;
+    color: #C987A1 !important;
+    /* 晨曦映雪 - 导航项悬停颜色，提供温暖的互动反馈 */
 }
 
 #nav .site-page:not(.child)::after {
-    background-color: #588b6d;
+    background-color: #8A6D7C;
+    /* 暮光冰莓 - 导航项下划线或指示背景色，与分页器同色，柔和统一 */
 }
 
 #aside-content .card-announcement .item-headline i {
-    color: #4d7d64;
+    color: #C987A1;
+    /* 晨曦映雪 - 侧边栏公告标题图标颜色，保持强调元素的活跃感 */
     transform: none !important;
+}
+
+
+#go-up>i {
+    width: 100%;
 }
