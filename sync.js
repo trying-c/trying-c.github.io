@@ -136,7 +136,27 @@ categories: ${formatTagsOrCategories(categories)}
 
                             content += `<img src="${postDirName}/${imageName}" alt="${imageName}" style="${customStyle}" />\n\n`;
                         }
-                    }
+                    }else if (block.type === 'quote') {
+    content += `> ${block.quote.rich_text.map(t => t.plain_text).join('')}\n\n`;
+}else if (block.type === 'callout') {
+    // Notion 的 callout 有一个 icon 属性，这里简化处理，只提取文本
+    content += `> [!NOTE]\n> ${block.callout.rich_text.map(t => t.plain_text).join('')}\n\n`;
+}else if (block.type === 'divider') {
+    content += `---\n\n`;
+}else if (block.type === 'toggle') {
+    content += `<details><summary>${block.toggle.rich_text.map(t => t.plain_text).join('')}</summary>\n\n`;
+    // 这里需要递归获取并处理 toggle 内部的块
+    // 考虑到复杂性，如果内容不深，可以暂时只获取顶层文本
+     const children = await notion.blocks.children.list({ block_id: block.id });
+     for (const childBlock of children.results) {
+         // 递归处理子块，这会使代码复杂化，需要单独的函数
+         // 为简洁起见，这里只做提示，具体实现需考虑
+         if (childBlock.type === 'paragraph') {
+             content += `  ${childBlock.paragraph.rich_text.map(t => t.plain_text).join('')}\n\n`;
+         }
+     }
+    content += `</details>\n\n`;
+}
 
 
 
