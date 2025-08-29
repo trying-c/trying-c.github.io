@@ -1,9 +1,12 @@
 name: Deploy Hexo to GitHub Pages
 
 on:
+  schedule:
+    - cron: "30 08 * * *" # 每天早上8点30分运行
+  workflow_dispatch: # 允许手动触发
   push:
     branches:
-      - main  # 当推送到 main 分支时触发
+      - main # 当推送到 main 分支时触发
 
 jobs:
   build:
@@ -13,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: false  # 禁用子模块检查
+          submodules: false # 禁用子模块检查
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -22,6 +25,12 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
+
+      - name: Sync Notion to Hexo
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: node sync.js
 
       - name: Install Hexo Git Deployer
         run: |
