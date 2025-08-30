@@ -1,0 +1,410 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务 | Tryingible</title><meta name="author" content="Trying Chung"><meta name="copyright" content="Trying Chung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F0F5F8"><meta name="description" content="好的，我们接着上一步，继续配置更多的国内 Docker 镜像加速源，并部署一个公网可以访问的 Minio 对象存储服务。 第四部分：配置更多国内 Docker 镜像加速源除了华为云自带的镜像加速器，还可以添加多个备用加速源，以提高镜像拉取的稳定性和速度。当一个源不稳定时，Docker 会自动尝试下一个。 常用的国内镜像加速源包括：  阿里云加速器 (需要登录阿里云容器镜像服务获取专属地址) 网易云">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务">
+<meta property="og:url" content="https://trying-c.github.io/posts/56438/index.html">
+<meta property="og:site_name" content="Tryingible">
+<meta property="og:description" content="好的，我们接着上一步，继续配置更多的国内 Docker 镜像加速源，并部署一个公网可以访问的 Minio 对象存储服务。 第四部分：配置更多国内 Docker 镜像加速源除了华为云自带的镜像加速器，还可以添加多个备用加速源，以提高镜像拉取的稳定性和速度。当一个源不稳定时，Docker 会自动尝试下一个。 常用的国内镜像加速源包括：  阿里云加速器 (需要登录阿里云容器镜像服务获取专属地址) 网易云">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trying-c.github.io/assets/imgs/cover/2.png">
+<meta property="article:published_time" content="2025-07-06T08:44:33.000Z">
+<meta property="article:modified_time" content="2025-08-30T08:42:40.826Z">
+<meta property="article:author" content="Trying Chung">
+<meta property="article:tag" content="华为云">
+<meta property="article:tag" content="安装教程">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="MinIO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trying-c.github.io/assets/imgs/cover/2.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务",
+  "url": "https://trying-c.github.io/posts/56438/",
+  "image": "https://trying-c.github.io/assets/imgs/cover/2.png",
+  "datePublished": "2025-07-06T08:44:33.000Z",
+  "dateModified": "2025-08-30T08:42:40.826Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Trying Chung",
+      "url": "https://trying-c.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/imgs/tc.ico"><link rel="canonical" href="https://trying-c.github.io/posts/56438/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#343D4E')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F0F5F8')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/assets/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/assets/imgs/bg.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/imgs/ooc.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Tryingible</span></a><a class="nav-page-title" href="/"><span class="site-name">在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2025-07-06T08:44:33.000Z" title="发表于 2025-07-06 16:44:33">2025-07-06</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>好的，我们接着上一步，继续配置更多的国内 Docker 镜像加速源，并部署一个公网可以访问的 Minio 对象存储服务。</p>
+<h3 id="第四部分：配置更多国内-Docker-镜像加速源"><a href="#第四部分：配置更多国内-Docker-镜像加速源" class="headerlink" title="第四部分：配置更多国内 Docker 镜像加速源"></a>第四部分：配置更多国内 Docker 镜像加速源</h3><p>除了华为云自带的镜像加速器，还可以添加多个备用加速源，以提高镜像拉取的稳定性和速度。当一个源不稳定时，Docker 会自动尝试下一个。</p>
+<p>常用的国内镜像加速源包括：</p>
+<ul>
+<li><strong>阿里云加速器</strong> (需要登录阿里云容器镜像服务获取专属地址)</li>
+<li><strong>网易云加速器</strong>: <code>http://hub-mirror.c.163.com</code></li>
+<li><strong>Docker 中国官方镜像</strong>: <code>https://registry.docker-cn.com</code></li>
+<li><strong>中科大镜像</strong>: <code>https://docker.mirrors.ustc.edu.cn</code></li>
+</ul>
+<p><strong>操作步骤：</strong></p>
+<ol>
+<li><p><strong>编辑 Docker 配置文件</strong>：<br>打开或创建 <code>/etc/docker/daemon.json</code> 文件。如果上一步已经创建了该文件，现在我们来编辑它。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vi /etc/docker/daemon.json</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>添加多个镜像源</strong>：<br>将文件内容修改为以下格式，将想用的加速器地址都加进去。我们把上次配置的华为云地址和这次新增的几个地址都放进去。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;registry-mirrors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;https://&lt;your-unique-code&gt;.mirror.swr.myhuaweicloud.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;http://hub-mirror.c.163.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;https://registry.docker-cn.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;https://docker.mirrors.ustc.edu.cn&quot;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：请务必将 <code>&lt;your-unique-code&gt;.mirror.swr.myhuaweicloud.com</code> 替换为自己的华为云专属加速地址。多个地址之间用英文逗号 <code>,</code> 分隔。</p>
+</li>
+<li><p><strong>保存文件并重启 Docker</strong>：<br>保存并退出 <code>vi</code> 编辑器 (按 <code>ESC</code>，然后输入 <code>:wq</code> 并回车)。之后，重新加载配置并重启 Docker 服务。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl daemon-reload</span><br><span class="line"><span class="built_in">sudo</span> systemctl restart docker</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>现在，的 Docker 已经配置了多个国内镜像源，拉取镜像的速度和稳定性会更有保障。</p>
+<hr>
+<h3 id="第五部分：使用-Docker-部署-MinIO-对象存储"><a href="#第五部分：使用-Docker-部署-MinIO-对象存储" class="headerlink" title="第五部分：使用 Docker 部署 MinIO 对象存储"></a>第五部分：使用 Docker 部署 MinIO 对象存储</h3><p>MinIO 是一个开源的高性能对象存储服务，兼容 Amazon S3 接口。使用 Docker 部署非常方便。</p>
+<p><strong>操作步骤：</strong></p>
+<ol>
+<li><p><strong>创建数据存储目录</strong>：<br>为了让 MinIO 的数据能够持久化存储（即使容器被删除，数据也不会丢失），我们需要在宿主机上创建一个目录，用于挂载到容器内部。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在当前用户的主目录下创建一个名为 minio-data 的文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> ~/minio-data</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>执行 Docker 命令部署 MinIO</strong>：<br>接下来，使用 <code>docker run</code> 命令来启动一个 MinIO 容器。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">   -p 9000:9000 \</span><br><span class="line">   -p 9090:9090 \</span><br><span class="line">   --name minio \</span><br><span class="line">   -v ~/minio-data:/data \</span><br><span class="line">   -e <span class="string">&quot;MINIO_ROOT_USER=admin&quot;</span> \</span><br><span class="line">   -e <span class="string">&quot;MINIO_ROOT_PASSWORD=password123&quot;</span> \</span><br><span class="line">   quay.io/minio/minio server /data --console-address <span class="string">&quot;:9090&quot;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述命令部署的是较新的版本，官方删除了相当多一部分的功能和权限模块。推荐用以下命令部署指定版本的MinIO，这个版本为最新的没有删除管理模块的版本。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">    --name minio \</span><br><span class="line">    -p 9000:9000 \</span><br><span class="line">    -p 9001:9001 \</span><br><span class="line">    -v ~/minio-data:/data \</span><br><span class="line">    -e MINIO_ROOT_USER=myadmin \</span><br><span class="line">    -e MINIO_ROOT_PASSWORD=mypassword123 \</span><br><span class="line">    minio/minio:RELEASE.2025-04-22T22-12-26Z \</span><br><span class="line">    server /data --console-address <span class="string">&quot;:9001&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>命令参数详解</strong>：</p>
+<ul>
+<li><code>-d</code>: 后台运行容器。</li>
+<li><code>-p 9000:9000</code>: 将容器的 <code>9000</code> 端口 (MinIO S3 API 端口) 映射到宿主机的 <code>9000</code> 端口。</li>
+<li><code>-p 9090:9090</code>: 将容器的 <code>9090</code> 端口 (MinIO Web 控制台端口) 映射到宿主机的 <code>9090</code> 端口。</li>
+<li><code>--name minio</code>: 给容器命名为 <code>minio</code>，方便管理。</li>
+<li><code>-v ~/minio-data:/data</code>: 将宿主机的 <code>~/minio-data</code> 目录挂载到容器内的 <code>/data</code> 目录。这是实现数据持久化的关键。</li>
+<li><code>-e &quot;MINIO_ROOT_USER=admin&quot;</code>: 设置 MinIO 的管理员用户名为 <code>admin</code>。<strong>请替换为自己的用户名</strong>。</li>
+<li><code>-e &quot;MINIO_ROOT_PASSWORD=password123&quot;</code>: 设置 MinIO 的管理员密码为 <code>password123</code>。<strong>强烈建议替换为一个更复杂的强密码</strong>。</li>
+<li><code>quay.io/minio/minio</code>: MinIO 的官方镜像地址。</li>
+<li><code>server /data --console-address &quot;:9090&quot;</code>: 启动 MinIO 服务，指定数据目录为 <code>/data</code>，并让控制台监听所有网络接口的 <code>9090</code> 端口。</li>
+</ul>
+</li>
+<li><p><strong>检查 MinIO 容器状态</strong>：<br>查看容器是否成功启动。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+
+<p>应该能看到一个名为 <code>minio</code> 的容器正在运行 (Up)。</p>
+</li>
+</ol>
+<hr>
+<h3 id="第六部分：配置安全组，使公网可以访问-MinIO"><a href="#第六部分：配置安全组，使公网可以访问-MinIO" class="headerlink" title="第六部分：配置安全组，使公网可以访问 MinIO"></a>第六部分：配置安全组，使公网可以访问 MinIO</h3><p>现在，MinIO 已经在的 Flexus L 实例上运行了，但是公网还无法访问它，因为云服务器的安全组默认是关闭大部分端口的。我们需要放行刚刚映射的 <code>9000</code> 和 <code>9090</code> 端口。</p>
+<p><strong>操作步骤：</strong></p>
+<ol>
+<li><strong>登录华为云控制台</strong>。</li>
+<li>进入“<strong>弹性云服务器 ECS</strong>” 管理页面。</li>
+<li>在左侧导航栏中，找到并点击“<strong>安全组</strong>”。</li>
+<li>找到的 Flexus L 实例所绑定的那个安全组，点击它的名字进入配置页面。</li>
+<li>在安全组规则页面，选择“<strong>入方向规则</strong>”，然后点击右上角的“<strong>添加规则</strong>”按钮。</li>
+<li><strong>添加入方向规则 (放行 9090 端口 - Web 控制台)</strong>：<ul>
+<li><strong>优先级</strong>: 保持默认的 <code>1</code> 即可。</li>
+<li><strong>策略</strong>: 选择“<strong>允许</strong>”。</li>
+<li><strong>协议端口</strong>: 选择“<strong>TCP</strong>”，然后在后面的输入框中填入 <code>9090</code>。</li>
+<li><strong>源地址</strong>: 为了安全起见，可以只填写自己电脑的公网 IP 地址。如果想让任何地方都能访问，可以填写 <code>0.0.0.0/0</code>。<strong>（注意：<code>0.0.0.0/0</code> 意味着对所有 IP 开放，请谨慎使用）</strong>。</li>
+<li>点击“<strong>确定</strong>”。</li>
+</ul>
+</li>
+<li><strong>添加入方向规则 (放行 9000 端口 - S3 API)</strong>：<ul>
+<li>重复上一步，再次点击“<strong>添加规则</strong>”。</li>
+<li><strong>协议端口</strong>: 选择“<strong>TCP</strong>”，填入 <code>9000</code>。</li>
+<li><strong>源地址</strong>: 同样，根据的需求填写自己的 IP 或 <code>0.0.0.0/0</code>。</li>
+<li>点击“<strong>确定</strong>”。</li>
+</ul>
+</li>
+</ol>
+<h3 id="第七部分：访问的-MinIO-服务"><a href="#第七部分：访问的-MinIO-服务" class="headerlink" title="第七部分：访问的 MinIO 服务"></a>第七部分：访问的 MinIO 服务</h3><p>一切就绪！现在可以在浏览器中访问的 MinIO Web 控制台了。</p>
+<ul>
+<li><strong>访问地址</strong>: <code>http://&lt;的Flexus L实例公网IP&gt;:9090</code></li>
+<li><strong>用户名</strong>: <code>admin</code> (或自己设置的 <code>MINIO_ROOT_USER</code>)</li>
+<li><strong>密码</strong>: <code>password123</code> (或自己设置的 <code>MINIO_ROOT_PASSWORD</code>)</li>
+</ul>
+<p>登录成功后，就可以看到 MinIO 的管理界面，可以创建存储桶 (Bucket)、上传和管理文件了。的应用程序也可以通过 <code>http://&lt;的Flexus L实例公网IP&gt;:9000</code> 这个地址来使用 S3 API 与 MinIO 进行交互。</p>
+<p>至此，已经成功地在华为云 Flexus L 实例上配置了 Docker 加速，并部署了一个公网可访问的 MinIO 对象存储服务。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%8D%8E%E4%B8%BA%E4%BA%91/">华为云</a><a class="post-meta__tags" href="/tags/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/">安装教程</a><a class="post-meta__tags" href="/tags/Docker/">Docker</a><a class="post-meta__tags" href="/tags/MinIO/">MinIO</a></div><div class="post-share"><div class="social-share" data-image="/assets/imgs/cover/2.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/posts/40870/" title="解决 Electron 安装失败问题 &quot;RequestError unable to verify the first certificate&quot;"><img class="cover" src="/assets/imgs/cover/5.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">解决 Electron 安装失败问题 "RequestError unable to verify the first certificate"</div></div><div class="info-2"><div class="info-item-1"> 记录一次 Electron 安装经历，以及最终通过 cnpm 成功解决的方案  问题背景npm install electron  使用 npm 或 yarn 安装 Electron 时持续报错： error RequestError: unable to verify the first certificate    ...  尝试使用 yarn 安装，同样的问题： yarn add e...</div></div></div></a><a class="pagination-related" href="/posts/53523/" title="使用 Gemini 指导在 Ubuntu 系统上安装 Docker"><img class="cover" src="/assets/imgs/cover/1.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">使用 Gemini 指导在 Ubuntu 系统上安装 Docker</div></div><div class="info-2"><div class="info-item-1">核心思想：在华为云 Flexus L 实例上安装 Docker，与在任何其他标准云服务器上安装 Docker 的过程基本一致。关键在于选择正确的操作系统，并通过 SSH 连接到实例后，执行相应的官方安装命令。 前提条件 已购买并运行一个华为云 Flexus L 实例： 在购买时，操作系统 (OS) 建议选择主流的 Linux 发行版，如 CentOS 7.x&#x2F;8.x 或 Ubunt...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/posts/53523/" title="使用 Gemini 指导在 Ubuntu 系统上安装 Docker"><img class="cover" src="/assets/imgs/cover/1.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-06</div><div class="info-item-2">使用 Gemini 指导在 Ubuntu 系统上安装 Docker</div></div><div class="info-2"><div class="info-item-1">核心思想：在华为云 Flexus L 实例上安装 Docker，与在任何其他标准云服务器上安装 Docker 的过程基本一致。关键在于选择正确的操作系统，并通过 SSH 连接到实例后，执行相应的官方安装命令。 前提条件 已购买并运行一个华为云 Flexus L 实例： 在购买时，操作系统 (OS) 建议选择主流的 Linux 发行版，如 CentOS 7.x&#x2F;8.x 或 Ubunt...</div></div></div></a><a class="pagination-related" href="/posts/40870/" title="解决 Electron 安装失败问题 &quot;RequestError unable to verify the first certificate&quot;"><img class="cover" src="/assets/imgs/cover/5.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-07</div><div class="info-item-2">解决 Electron 安装失败问题 &quot;RequestError unable to verify the first certificate&quot;</div></div><div class="info-2"><div class="info-item-1"> 记录一次 Electron 安装经历，以及最终通过 cnpm 成功解决的方案  问题背景npm install electron  使用 npm 或 yarn 安装 Electron 时持续报错： error RequestError: unable to verify the first certificate    ...  尝试使用 yarn 安装，同样的问题： yarn add e...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Waline</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="waline-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E9%85%8D%E7%BD%AE%E6%9B%B4%E5%A4%9A%E5%9B%BD%E5%86%85-Docker-%E9%95%9C%E5%83%8F%E5%8A%A0%E9%80%9F%E6%BA%90"><span class="toc-number">1.</span> <span class="toc-text">第四部分：配置更多国内 Docker 镜像加速源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E9%83%A8%E5%88%86%EF%BC%9A%E4%BD%BF%E7%94%A8-Docker-%E9%83%A8%E7%BD%B2-MinIO-%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8"><span class="toc-number">2.</span> <span class="toc-text">第五部分：使用 Docker 部署 MinIO 对象存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E9%83%A8%E5%88%86%EF%BC%9A%E9%85%8D%E7%BD%AE%E5%AE%89%E5%85%A8%E7%BB%84%EF%BC%8C%E4%BD%BF%E5%85%AC%E7%BD%91%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE-MinIO"><span class="toc-number">3.</span> <span class="toc-text">第六部分：配置安全组，使公网可以访问 MinIO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E9%83%A8%E5%88%86%EF%BC%9A%E8%AE%BF%E9%97%AE%E7%9A%84-MinIO-%E6%9C%8D%E5%8A%A1"><span class="toc-number">4.</span> <span class="toc-text">第七部分：访问的 MinIO 服务</span></a></li></ol></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By Trying Chung</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  let initFn = window.walineFn || null
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"locale":{"nick":"昵称","mail":"邮箱","link":"你的网站","placeholder":"留下你的足迹o(*￣▽￣*)ブ （PS:填写数字QQ邮箱可以自动获取QQ头像）","requiredMeta":[],"sofa":"评论区空空如也~呜呜呜","login":"登录(可选)"},"reaction":false,"search":false,"emoji":["//unpkg.com/@waline/emojis@1.2.0/bilibili","//unpkg.com/@waline/emojis@1.2.0/qq","//unpkg.com/@waline/emojis@1.2.0/tieba","//unpkg.com/@waline/emojis@1.2.0/weibo"]}
+
+  const destroyWaline = ele => ele.destroy()
+
+  const initWaline = (Fn, el = document, path = window.location.pathname) => {
+    const waline = Fn({
+      el: el.querySelector('#waline-wrap'),
+      serverURL: 'https://forwaline-vercel-8crt.vercel.app/',
+      pageview: false,
+      dark: 'html[data-theme="dark"]',
+      comment: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || path
+    })
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyWaline = () => {
+        destroyWaline(waline)
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const loadWaline = (el, path) => {
+    if (initFn) initWaline(initFn, el, path)
+    else {
+      btf.getCSS('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.css')
+        .then(() => import('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.js'))
+        .then(({ init }) => {
+          initFn = init || Waline.init
+          initWaline(initFn, el, path)
+          window.walineFn = initFn
+        })
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Waline'
+      ? window.shuoshuoComment = { loadComment: loadWaline } 
+      : window.loadOtherComment = loadWaline
+    return
+  }
+
+  if ('Waline' === 'Waline' || !true) {
+    if (true) btf.loadComment(document.getElementById('waline-wrap'),loadWaline)
+    else setTimeout(loadWaline, 0)
+  } else {
+    window.loadOtherComment = loadWaline
+  }
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"placeholder":"留下你的足迹o(*￣▽￣*)ブ"}
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'UiqS9a0n4lJdFRrqPbrgjpbS-MdYXbMMI',
+      appKey: 'NkeAhjIM8aY4DBSeOIzuQ1qQ',
+      avatar: 'hide',
+      serverURLs: 'https://uiqs9a0n.api.lncldglobal.com',
+      emojiMaps: "",
+      visitor: true,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Waline' === 'Valine' || !true) {
+    if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="输入你想找的关键字吧~" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

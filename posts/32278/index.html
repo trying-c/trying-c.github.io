@@ -1,0 +1,367 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>面试准备之工作项目复盘-前端性能优化方案 | Tryingible</title><meta name="author" content="Trying Chung"><meta name="copyright" content="Trying Chung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F0F5F8"><meta name="description" content="在当今的 Web 开发中，前端性能优化已经成为一个不可忽视的话题。用户对网页加载速度和交互体验的要求越来越高，而前端性能优化正是提升用户体验的关键。在工作项目中，合理应用性能优化方案不仅能够提升用户满意度，还能为企业带来更多的商业价值。 本文将结合我在工作项目中的实际经验，详细介绍一些前端性能优化方案，并复盘这些方案在项目中的应用效果。同时，我还将针对面试中常见的前端性能优化问题，给出一些建议和答">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面试准备之工作项目复盘-前端性能优化方案">
+<meta property="og:url" content="https://trying-c.github.io/posts/32278/index.html">
+<meta property="og:site_name" content="Tryingible">
+<meta property="og:description" content="在当今的 Web 开发中，前端性能优化已经成为一个不可忽视的话题。用户对网页加载速度和交互体验的要求越来越高，而前端性能优化正是提升用户体验的关键。在工作项目中，合理应用性能优化方案不仅能够提升用户满意度，还能为企业带来更多的商业价值。 本文将结合我在工作项目中的实际经验，详细介绍一些前端性能优化方案，并复盘这些方案在项目中的应用效果。同时，我还将针对面试中常见的前端性能优化问题，给出一些建议和答">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trying-c.github.io/assets/imgs/cover/5.png">
+<meta property="article:published_time" content="2025-05-06T13:06:24.000Z">
+<meta property="article:modified_time" content="2025-08-30T08:42:40.827Z">
+<meta property="article:author" content="Trying Chung">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="性能优化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trying-c.github.io/assets/imgs/cover/5.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "面试准备之工作项目复盘-前端性能优化方案",
+  "url": "https://trying-c.github.io/posts/32278/",
+  "image": "https://trying-c.github.io/assets/imgs/cover/5.png",
+  "datePublished": "2025-05-06T13:06:24.000Z",
+  "dateModified": "2025-08-30T08:42:40.827Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Trying Chung",
+      "url": "https://trying-c.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/imgs/tc.ico"><link rel="canonical" href="https://trying-c.github.io/posts/32278/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#343D4E')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F0F5F8')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '面试准备之工作项目复盘-前端性能优化方案',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/assets/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/assets/imgs/bg.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/imgs/ooc.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Tryingible</span></a><a class="nav-page-title" href="/"><span class="site-name">面试准备之工作项目复盘-前端性能优化方案</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">面试准备之工作项目复盘-前端性能优化方案</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2025-05-06T13:06:24.000Z" title="发表于 2025-05-06 21:06:24">2025-05-06</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>在当今的 Web 开发中，前端性能优化已经成为一个不可忽视的话题。用户对网页加载速度和交互体验的要求越来越高，而前端性能优化正是提升用户体验的关键。在工作项目中，合理应用性能优化方案不仅能够提升用户满意度，还能为企业带来更多的商业价值。</p>
+<p>本文将结合我在工作项目中的实际经验，详细介绍一些前端性能优化方案，并复盘这些方案在项目中的应用效果。同时，我还将针对面试中常见的前端性能优化问题，给出一些建议和答案。</p>
+<h2 id="性能优化方案"><a href="#性能优化方案" class="headerlink" title="性能优化方案"></a>性能优化方案</h2><p>以下是一些常见的前端性能优化方法及其具体实现：</p>
+<h3 id="图片优化"><a href="#图片优化" class="headerlink" title="图片优化"></a>图片优化</h3><p>图片通常是网页中占用带宽最大的资源，优化图片可以显著提升加载速度。</p>
+<ul>
+<li><strong>压缩图片</strong>：使用工具如 TinyPNG 或 ImageOptim 对图片进行压缩，减小文件大小。</li>
+<li><strong>使用 WebP 格式</strong>：WebP 是一种现代图片格式，在保持相同质量的情况下比 JPEG 和 PNG 更小。</li>
+<li><strong>懒加载</strong>：对于页面下方的图片，使用懒加载技术，仅在图片进入视口时加载。</li>
+</ul>
+<h3 id="代码分割"><a href="#代码分割" class="headerlink" title="代码分割"></a>代码分割</h3><p>代码分割是将 JavaScript 代码拆分成多个小文件的技术，从而减少初始加载时间。</p>
+<ul>
+<li><strong>Webpack 配置</strong>：通过 Webpack 的<code>splitChunks</code>插件，将第三方库和业务代码分离。</li>
+<li><strong>动态导入</strong>：使用<code>import()</code>语法实现模块的按需加载。</li>
+</ul>
+<h3 id="懒加载"><a href="#懒加载" class="headerlink" title="懒加载"></a>懒加载</h3><p>懒加载不仅适用于图片，还可用于视频、音频等资源。</p>
+<ul>
+<li><strong>Intersection Observer</strong>：利用 Intersection Observer API 实现高效的懒加载，监听元素是否进入视口。</li>
+</ul>
+<h3 id="缓存策略"><a href="#缓存策略" class="headerlink" title="缓存策略"></a>缓存策略</h3><p>合理使用缓存可以减少网络请求，提升页面加载速度。</p>
+<ul>
+<li><strong>HTTP 缓存</strong>：设置<code>Cache-Control</code>和<code>ETag</code>头部，确保资源被浏览器缓存。</li>
+<li><strong>Service Worker</strong>：通过 Service Worker 实现更细粒度的缓存控制，甚至支持离线访问。</li>
+</ul>
+<h3 id="减少-HTTP-请求"><a href="#减少-HTTP-请求" class="headerlink" title="减少 HTTP 请求"></a>减少 HTTP 请求</h3><p>HTTP 请求是性能瓶颈之一，减少请求数量能有效提升速度。</p>
+<ul>
+<li><strong>合并文件</strong>：将多个 CSS 和 JavaScript 文件合并为一个。</li>
+<li><strong>内联小资源</strong>：对于小型 CSS 和 JavaScript，直接内联到 HTML 中。</li>
+</ul>
+<h3 id="优化-CSS-和-JavaScript"><a href="#优化-CSS-和-JavaScript" class="headerlink" title="优化 CSS 和 JavaScript"></a>优化 CSS 和 JavaScript</h3><p>CSS 和 JavaScript 的执行效率直接影响页面渲染。</p>
+<ul>
+<li><strong>CSS 优化</strong>：避免复杂选择器，减少重绘和回流。</li>
+<li><strong>JavaScript 优化</strong>：使用防抖和节流技术降低事件处理频率。</li>
+</ul>
+<h2 id="工作项目复盘"><a href="#工作项目复盘" class="headerlink" title="工作项目复盘"></a>工作项目复盘</h2><p>在以往的工作项目中，我们常常面临页面加载慢、用户体验差的问题。具体有以下的内容：</p>
+<h3 id="图片优化-1"><a href="#图片优化-1" class="headerlink" title="图片优化"></a>图片优化</h3><p>我们对所有图片进行压缩，并将 JPEG 转换为 WebP 格式，同时为商品列表实现懒加载。结果，页面加载时间减少了 30%。</p>
+<h3 id="代码分割-1"><a href="#代码分割-1" class="headerlink" title="代码分割"></a>代码分割</h3><p>通过 Webpack 将第三方库（如 React、Redux）与业务代码分离，并使用动态导入，初始 JavaScript 文件大小减少了 50%。</p>
+<h3 id="懒加载-1"><a href="#懒加载-1" class="headerlink" title="懒加载"></a>懒加载</h3><p>我们不仅对图片，还对视频和音频资源实现了懒加载，确保资源按需加载。</p>
+<h3 id="缓存策略-1"><a href="#缓存策略-1" class="headerlink" title="缓存策略"></a>缓存策略</h3><p>为静态资源设置长期缓存，并使用 Service Worker 实现离线访问，提升了加载速度和用户体验。</p>
+<h3 id="减少-HTTP-请求-1"><a href="#减少-HTTP-请求-1" class="headerlink" title="减少 HTTP 请求"></a>减少 HTTP 请求</h3><p>通过合并 CSS 和 JavaScript 文件、内联小资源，HTTP 请求数量减少了 40%。</p>
+<h3 id="优化-CSS-和-JavaScript-1"><a href="#优化-CSS-和-JavaScript-1" class="headerlink" title="优化 CSS 和 JavaScript"></a>优化 CSS 和 JavaScript</h3><p>优化 CSS 选择器减少重绘和回流，在事件处理中应用防抖和节流技术，提升页面响应速度。</p>
+<p>这些措施使项目性能大幅提升，用户反馈也更加积极。</p>
+<h2 id="面试准备"><a href="#面试准备" class="headerlink" title="面试准备"></a>面试准备</h2><p>前端性能优化是面试中的热门话题，以下是一些常见问题及答案：</p>
+<h3 id="你在项目中是如何进行性能优化的？"><a href="#你在项目中是如何进行性能优化的？" class="headerlink" title="你在项目中是如何进行性能优化的？"></a>你在项目中是如何进行性能优化的？</h3><p><strong>答案</strong>：我从图片优化、代码分割、懒加载、缓存策略、减少 HTTP 请求及优化 CSS 和 JavaScript 入手。例如，压缩图片、使用 WebP、实现懒加载、使用 Webpack 分割代码、设置 HTTP 缓存、使用 Service Worker、合并文件、内联资源、优化选择器及使用防抖节流等。</p>
+<h3 id="什么是懒加载？如何实现？"><a href="#什么是懒加载？如何实现？" class="headerlink" title="什么是懒加载？如何实现？"></a>什么是懒加载？如何实现？</h3><p><strong>答案</strong>：懒加载是延迟加载资源的技术，仅在资源进入视口或用户需要时加载。可通过 Intersection Observer API 实现，监听元素可见性以触发加载。</p>
+<h3 id="如何减少-HTTP-请求？"><a href="#如何减少-HTTP-请求？" class="headerlink" title="如何减少 HTTP 请求？"></a>如何减少 HTTP 请求？</h3><p><strong>答案</strong>：可以通过合并 CSS 和 JavaScript 文件、内联小资源、使用 CSS Sprites 及延迟加载非关键资源来减少 HTTP 请求。</p>
+<h3 id="什么是代码分割？为什么要做代码分割？"><a href="#什么是代码分割？为什么要做代码分割？" class="headerlink" title="什么是代码分割？为什么要做代码分割？"></a>什么是代码分割？为什么要做代码分割？</h3><p><strong>答案</strong>：代码分割是将 JavaScript 拆分为多个小文件，按需加载的技术。它能减少初始加载时间，提升页面性能和用户体验。</p>
+<h3 id="你如何优化-CSS-和-JavaScript？"><a href="#你如何优化-CSS-和-JavaScript？" class="headerlink" title="你如何优化 CSS 和 JavaScript？"></a>你如何优化 CSS 和 JavaScript？</h3><p><strong>答案</strong>：CSS 优化包括避免复杂选择器、减少重绘回流、将 CSS 放<code>&lt;head&gt;</code>中；JavaScript 优化包括使用防抖节流、避免阻塞主线程、按需加载模块。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>前端性能优化是一个持续的过程，需要在开发中不断调整和完善。通过本文的介绍，希望大家能更好地理解和应用这些方案，提升项目性能和用户体验。同时，这些内容也能为你的面试准备提供帮助。</p>
+<p>如果你有任何问题或建议，欢迎在评论区留言！</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%89%8D%E7%AB%AF/">前端</a><a class="post-meta__tags" href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">性能优化</a></div><div class="post-share"><div class="social-share" data-image="/assets/imgs/cover/5.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/posts/35100/" title="Vue3学习：Ref全家桶"><img class="cover" src="/assets/imgs/cover/4.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Vue3学习：Ref全家桶</div></div><div class="info-2"><div class="info-item-1">初识 Ref 家族在 Vue3 的响应式系统中，Ref 家族成员扮演着重要角色。它们帮助我们处理基本类型和复杂类型的响应式需求，下面让我们逐个认识这些实用的 API。 ref：响应式数据声明import &#123; ref &#125; from &quot;vue&quot;;// 创建响应式数据const count = ref(0);// 修改值需要.valuefunction in...</div></div></div></a><a class="pagination-related" href="/posts/38521/" title="为Hexo博客添加Waline评论系统的具体操作步骤"><img class="cover" src="/assets/imgs/cover/1.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">为Hexo博客添加Waline评论系统的具体操作步骤</div></div><div class="info-2"><div class="info-item-1">最近想把博客的评论系统从无到有搭建起来，最终选择了轻量且支持数据库的 Waline。记录下完整的配置流程，包含服务端部署与前端集成细节。  🚧 操作环境 静态博客框架：Hexo 主题：Butterfly 评论系统：Waline 数据库服务：LeanCloud（免费套餐）   🔧 配置步骤一、准备后端服务1. 注册 LeanCloud 访问 LeanCloud 国际版 创建新应用（如 Bl...</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Waline</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="waline-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">1.</span> <span class="toc-text">性能优化方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E4%BC%98%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">图片优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2"><span class="toc-number">1.2.</span> <span class="toc-text">代码分割</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%87%92%E5%8A%A0%E8%BD%BD"><span class="toc-number">1.3.</span> <span class="toc-text">懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5"><span class="toc-number">1.4.</span> <span class="toc-text">缓存策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%8F%E5%B0%91-HTTP-%E8%AF%B7%E6%B1%82"><span class="toc-number">1.5.</span> <span class="toc-text">减少 HTTP 请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96-CSS-%E5%92%8C-JavaScript"><span class="toc-number">1.6.</span> <span class="toc-text">优化 CSS 和 JavaScript</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E9%A1%B9%E7%9B%AE%E5%A4%8D%E7%9B%98"><span class="toc-number">2.</span> <span class="toc-text">工作项目复盘</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E4%BC%98%E5%8C%96-1"><span class="toc-number">2.1.</span> <span class="toc-text">图片优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2-1"><span class="toc-number">2.2.</span> <span class="toc-text">代码分割</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%87%92%E5%8A%A0%E8%BD%BD-1"><span class="toc-number">2.3.</span> <span class="toc-text">懒加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5-1"><span class="toc-number">2.4.</span> <span class="toc-text">缓存策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%8F%E5%B0%91-HTTP-%E8%AF%B7%E6%B1%82-1"><span class="toc-number">2.5.</span> <span class="toc-text">减少 HTTP 请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96-CSS-%E5%92%8C-JavaScript-1"><span class="toc-number">2.6.</span> <span class="toc-text">优化 CSS 和 JavaScript</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87"><span class="toc-number">3.</span> <span class="toc-text">面试准备</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E6%98%AF%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%9A%84%EF%BC%9F"><span class="toc-number">3.1.</span> <span class="toc-text">你在项目中是如何进行性能优化的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%87%92%E5%8A%A0%E8%BD%BD%EF%BC%9F%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%EF%BC%9F"><span class="toc-number">3.2.</span> <span class="toc-text">什么是懒加载？如何实现？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%87%8F%E5%B0%91-HTTP-%E8%AF%B7%E6%B1%82%EF%BC%9F"><span class="toc-number">3.3.</span> <span class="toc-text">如何减少 HTTP 请求？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%81%9A%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2%EF%BC%9F"><span class="toc-number">3.4.</span> <span class="toc-text">什么是代码分割？为什么要做代码分割？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96-CSS-%E5%92%8C-JavaScript%EF%BC%9F"><span class="toc-number">3.5.</span> <span class="toc-text">你如何优化 CSS 和 JavaScript？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E8%AF%AD"><span class="toc-number">4.</span> <span class="toc-text">结语</span></a></li></ol></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By Trying Chung</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  let initFn = window.walineFn || null
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"locale":{"nick":"昵称","mail":"邮箱","link":"你的网站","placeholder":"留下你的足迹o(*￣▽￣*)ブ （PS:填写数字QQ邮箱可以自动获取QQ头像）","requiredMeta":[],"sofa":"评论区空空如也~呜呜呜","login":"登录(可选)"},"reaction":false,"search":false,"emoji":["//unpkg.com/@waline/emojis@1.2.0/bilibili","//unpkg.com/@waline/emojis@1.2.0/qq","//unpkg.com/@waline/emojis@1.2.0/tieba","//unpkg.com/@waline/emojis@1.2.0/weibo"]}
+
+  const destroyWaline = ele => ele.destroy()
+
+  const initWaline = (Fn, el = document, path = window.location.pathname) => {
+    const waline = Fn({
+      el: el.querySelector('#waline-wrap'),
+      serverURL: 'https://forwaline-vercel-8crt.vercel.app/',
+      pageview: false,
+      dark: 'html[data-theme="dark"]',
+      comment: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || path
+    })
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyWaline = () => {
+        destroyWaline(waline)
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const loadWaline = (el, path) => {
+    if (initFn) initWaline(initFn, el, path)
+    else {
+      btf.getCSS('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.css')
+        .then(() => import('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.js'))
+        .then(({ init }) => {
+          initFn = init || Waline.init
+          initWaline(initFn, el, path)
+          window.walineFn = initFn
+        })
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Waline'
+      ? window.shuoshuoComment = { loadComment: loadWaline } 
+      : window.loadOtherComment = loadWaline
+    return
+  }
+
+  if ('Waline' === 'Waline' || !true) {
+    if (true) btf.loadComment(document.getElementById('waline-wrap'),loadWaline)
+    else setTimeout(loadWaline, 0)
+  } else {
+    window.loadOtherComment = loadWaline
+  }
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"placeholder":"留下你的足迹o(*￣▽￣*)ブ"}
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'UiqS9a0n4lJdFRrqPbrgjpbS-MdYXbMMI',
+      appKey: 'NkeAhjIM8aY4DBSeOIzuQ1qQ',
+      avatar: 'hide',
+      serverURLs: 'https://uiqs9a0n.api.lncldglobal.com',
+      emojiMaps: "",
+      visitor: true,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Waline' === 'Valine' || !true) {
+    if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="输入你想找的关键字吧~" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

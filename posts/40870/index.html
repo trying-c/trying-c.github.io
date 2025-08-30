@@ -1,0 +1,362 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>解决 Electron 安装失败问题 &quot;RequestError unable to verify the first certificate&quot; | Tryingible</title><meta name="author" content="Trying Chung"><meta name="copyright" content="Trying Chung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F0F5F8"><meta name="description" content="记录一次 Electron 安装经历，以及最终通过 cnpm 成功解决的方案  问题背景npm install electron  使用 npm 或 yarn 安装 Electron 时持续报错： error RequestError: unable to verify the first certificate    ...  尝试使用 yarn 安装，同样的问题： yarn add elec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解决 Electron 安装失败问题 &quot;RequestError unable to verify the first certificate&quot;">
+<meta property="og:url" content="https://trying-c.github.io/posts/40870/index.html">
+<meta property="og:site_name" content="Tryingible">
+<meta property="og:description" content="记录一次 Electron 安装经历，以及最终通过 cnpm 成功解决的方案  问题背景npm install electron  使用 npm 或 yarn 安装 Electron 时持续报错： error RequestError: unable to verify the first certificate    ...  尝试使用 yarn 安装，同样的问题： yarn add elec">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trying-c.github.io/assets/imgs/cover/5.png">
+<meta property="article:published_time" content="2025-07-07T09:39:17.000Z">
+<meta property="article:modified_time" content="2025-08-30T08:42:40.826Z">
+<meta property="article:author" content="Trying Chung">
+<meta property="article:tag" content="安装教程">
+<meta property="article:tag" content="Electron">
+<meta property="article:tag" content="Node">
+<meta property="article:tag" content="NPM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trying-c.github.io/assets/imgs/cover/5.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "解决 Electron 安装失败问题 \"RequestError unable to verify the first certificate\"",
+  "url": "https://trying-c.github.io/posts/40870/",
+  "image": "https://trying-c.github.io/assets/imgs/cover/5.png",
+  "datePublished": "2025-07-07T09:39:17.000Z",
+  "dateModified": "2025-08-30T08:42:40.826Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Trying Chung",
+      "url": "https://trying-c.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/assets/imgs/tc.ico"><link rel="canonical" href="https://trying-c.github.io/posts/40870/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#343D4E')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F0F5F8')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '解决 Electron 安装失败问题 "RequestError unable to verify the first certificate"',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/assets/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/assets/imgs/bg.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/assets/imgs/ooc.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Tryingible</span></a><a class="nav-page-title" href="/"><span class="site-name">解决 Electron 安装失败问题 &quot;RequestError unable to verify the first certificate&quot;</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">解决 Electron 安装失败问题 &quot;RequestError unable to verify the first certificate&quot;</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2025-07-07T09:39:17.000Z" title="发表于 2025-07-07 17:39:17">2025-07-07</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">485</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>1分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><blockquote>
+<p>记录一次 Electron 安装经历，以及最终通过 cnpm 成功解决的方案</p>
+</blockquote>
+<h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install electron</span><br></pre></td></tr></table></figure>
+
+<p>使用 npm 或 yarn 安装 Electron 时持续报错：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">error RequestError: unable to verify the first certificate</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>尝试使用 yarn 安装，同样的问题：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yarn add electron</span><br></pre></td></tr></table></figure>
+
+<p>错误信息基本相同，核心提示都是 <strong>“unable to verify the first certificate”</strong>，这意味着 SSL 证书验证失败。</p>
+<h2 id="尝试解决方案"><a href="#尝试解决方案" class="headerlink" title="尝试解决方案"></a>尝试解决方案</h2><h3 id="方法-1：切换国内镜像源"><a href="#方法-1：切换国内镜像源" class="headerlink" title="方法 1：切换国内镜像源"></a>方法 1：切换国内镜像源</h3><p>首先尝试切换到淘宝源，这是国内开发者常用的解决方案：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm config <span class="built_in">set</span> registry https://registry.npmmirror.com</span><br></pre></td></tr></table></figure>
+
+<p>再次运行 <code>npm install electron</code> - 问题依旧！</p>
+<h3 id="方法-2：跳过-SSL-证书验证"><a href="#方法-2：跳过-SSL-证书验证" class="headerlink" title="方法 2：跳过 SSL 证书验证"></a>方法 2：跳过 SSL 证书验证</h3><p>既然报错是证书问题，尝试关闭 SSL 验证：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm config <span class="built_in">set</span> strict-ssl <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<p>再次运行 <code>npm install electron</code> - 问题依旧！</p>
+<h3 id="方法-3：清除-npm-缓存"><a href="#方法-3：清除-npm-缓存" class="headerlink" title="方法 3：清除 npm 缓存"></a>方法 3：清除 npm 缓存</h3><p>怀疑缓存问题，尝试清除缓存后重试：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm cache clean --force</span><br><span class="line"><span class="built_in">rm</span> -rf node_modules</span><br><span class="line"><span class="built_in">rm</span> package-lock.json</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+
+<p>结果 - 没有任何改变。</p>
+<h3 id="方法-4：设置代理环境变量"><a href="#方法-4：设置代理环境变量" class="headerlink" title="方法 4：设置代理环境变量"></a>方法 4：设置代理环境变量</h3><p>尝试设置 Node.js 的代理环境变量：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">set</span> NODE_TLS_REJECT_UNAUTHORIZED=0</span><br><span class="line">npm install electron</span><br></pre></td></tr></table></figure>
+
+<p>还是同样的错误，问题依然存在。</p>
+<h2 id="尝试-cnpm"><a href="#尝试-cnpm" class="headerlink" title="尝试 cnpm"></a>尝试 cnpm</h2><p>搜索相关问题，看到用 cnpm 成功安装的案例，故尝试：</p>
+<h3 id="安装-cnpm"><a href="#安装-cnpm" class="headerlink" title="安装 cnpm"></a>安装 cnpm</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm --registry=https://registry.npmmirror.com</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-cnpm-安装-Electron"><a href="#使用-cnpm-安装-Electron" class="headerlink" title="使用 cnpm 安装 Electron"></a>使用 cnpm 安装 Electron</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cnpm install electron</span><br></pre></td></tr></table></figure>
+
+<p>最终成功安装了 Electron！</p>
+<h2 id="为什么-cnpm-能成功？"><a href="#为什么-cnpm-能成功？" class="headerlink" title="为什么 cnpm 能成功？"></a>为什么 cnpm 能成功？</h2><p>思考整个解决过程，虽然切换了 npm 源，但 npm 客户端本身在请求时可能仍有某些安全限制。而 cnpm 作为专门为国内环境优化的工具：</p>
+<ol>
+<li>内置了适合国内网络的默认配置</li>
+<li>对证书验证的处理可能更宽松</li>
+<li>使用了专门为国内优化的下载逻辑</li>
+</ol>
+<h3 id="推荐安装方法"><a href="#推荐安装方法" class="headerlink" title="推荐安装方法"></a>推荐安装方法</h3><p>对于国内开发者，建议采用以下流程安装 Electron：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 安装cnpm</span></span><br><span class="line">npm install -g cnpm --registry=https://registry.npmmirror.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 使用cnpm安装Electron</span></span><br><span class="line">cnpm install electron</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 验证安装</span></span><br><span class="line">npx electron -v</span><br></pre></td></tr></table></figure>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/">安装教程</a><a class="post-meta__tags" href="/tags/Electron/">Electron</a><a class="post-meta__tags" href="/tags/Node/">Node</a><a class="post-meta__tags" href="/tags/NPM/">NPM</a></div><div class="post-share"><div class="social-share" data-image="/assets/imgs/cover/5.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/posts/55903/" title="Notion写作同步更新Hexo博客"><img class="cover" src="/assets/imgs/cover/3.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Notion写作同步更新Hexo博客</div></div><div class="info-2"><div class="info-item-1">自建站以来，我发现Hexo博客更新文章的操作相对繁琐，不仅要处理 Markdown 格式转换，还要手动上传图片，调整链接，设置 Front-matter……这大量的重复性工作不仅耗时，还容易出错，这些都十分容易影响个人写作的积极性。 所以，今天我终于下定决心解决这个问题——搭建一套基于 Notion API、Node.js 脚本和 GitHub Actions 的自动化工作流。即在 Noti...</div></div></div></a><a class="pagination-related" href="/posts/56438/" title="在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务"><img class="cover" src="/assets/imgs/cover/2.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务</div></div><div class="info-2"><div class="info-item-1">好的，我们接着上一步，继续配置更多的国内 Docker 镜像加速源，并部署一个公网可以访问的 Minio 对象存储服务。 第四部分：配置更多国内 Docker 镜像加速源除了华为云自带的镜像加速器，还可以添加多个备用加速源，以提高镜像拉取的稳定性和速度。当一个源不稳定时，Docker 会自动尝试下一个。 常用的国内镜像加速源包括：  阿里云加速器 (需要登录阿里云容器镜像服务获取专属地址) ...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/posts/56438/" title="在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务"><img class="cover" src="/assets/imgs/cover/2.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-06</div><div class="info-item-2">在 Ubuntu 系统上使用 Docker 部署 MinIO 对象存储服务</div></div><div class="info-2"><div class="info-item-1">好的，我们接着上一步，继续配置更多的国内 Docker 镜像加速源，并部署一个公网可以访问的 Minio 对象存储服务。 第四部分：配置更多国内 Docker 镜像加速源除了华为云自带的镜像加速器，还可以添加多个备用加速源，以提高镜像拉取的稳定性和速度。当一个源不稳定时，Docker 会自动尝试下一个。 常用的国内镜像加速源包括：  阿里云加速器 (需要登录阿里云容器镜像服务获取专属地址) ...</div></div></div></a><a class="pagination-related" href="/posts/53523/" title="使用 Gemini 指导在 Ubuntu 系统上安装 Docker"><img class="cover" src="/assets/imgs/cover/1.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-06</div><div class="info-item-2">使用 Gemini 指导在 Ubuntu 系统上安装 Docker</div></div><div class="info-2"><div class="info-item-1">核心思想：在华为云 Flexus L 实例上安装 Docker，与在任何其他标准云服务器上安装 Docker 的过程基本一致。关键在于选择正确的操作系统，并通过 SSH 连接到实例后，执行相应的官方安装命令。 前提条件 已购买并运行一个华为云 Flexus L 实例： 在购买时，操作系统 (OS) 建议选择主流的 Linux 发行版，如 CentOS 7.x&#x2F;8.x 或 Ubunt...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Waline</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="waline-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%9D%E8%AF%95%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-number">2.</span> <span class="toc-text">尝试解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9A%E5%88%87%E6%8D%A2%E5%9B%BD%E5%86%85%E9%95%9C%E5%83%8F%E6%BA%90"><span class="toc-number">2.1.</span> <span class="toc-text">方法 1：切换国内镜像源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95-2%EF%BC%9A%E8%B7%B3%E8%BF%87-SSL-%E8%AF%81%E4%B9%A6%E9%AA%8C%E8%AF%81"><span class="toc-number">2.2.</span> <span class="toc-text">方法 2：跳过 SSL 证书验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95-3%EF%BC%9A%E6%B8%85%E9%99%A4-npm-%E7%BC%93%E5%AD%98"><span class="toc-number">2.3.</span> <span class="toc-text">方法 3：清除 npm 缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95-4%EF%BC%9A%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%90%86%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="toc-number">2.4.</span> <span class="toc-text">方法 4：设置代理环境变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%9D%E8%AF%95-cnpm"><span class="toc-number">3.</span> <span class="toc-text">尝试 cnpm</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-cnpm"><span class="toc-number">3.1.</span> <span class="toc-text">安装 cnpm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-cnpm-%E5%AE%89%E8%A3%85-Electron"><span class="toc-number">3.2.</span> <span class="toc-text">使用 cnpm 安装 Electron</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-cnpm-%E8%83%BD%E6%88%90%E5%8A%9F%EF%BC%9F"><span class="toc-number">4.</span> <span class="toc-text">为什么 cnpm 能成功？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E8%8D%90%E5%AE%89%E8%A3%85%E6%96%B9%E6%B3%95"><span class="toc-number">4.1.</span> <span class="toc-text">推荐安装方法</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By Trying Chung</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  let initFn = window.walineFn || null
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"locale":{"nick":"昵称","mail":"邮箱","link":"你的网站","placeholder":"留下你的足迹o(*￣▽￣*)ブ （PS:填写数字QQ邮箱可以自动获取QQ头像）","requiredMeta":[],"sofa":"评论区空空如也~呜呜呜","login":"登录(可选)"},"reaction":false,"search":false,"emoji":["//unpkg.com/@waline/emojis@1.2.0/bilibili","//unpkg.com/@waline/emojis@1.2.0/qq","//unpkg.com/@waline/emojis@1.2.0/tieba","//unpkg.com/@waline/emojis@1.2.0/weibo"]}
+
+  const destroyWaline = ele => ele.destroy()
+
+  const initWaline = (Fn, el = document, path = window.location.pathname) => {
+    const waline = Fn({
+      el: el.querySelector('#waline-wrap'),
+      serverURL: 'https://forwaline-vercel-8crt.vercel.app/',
+      pageview: false,
+      dark: 'html[data-theme="dark"]',
+      comment: false,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || path
+    })
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyWaline = () => {
+        destroyWaline(waline)
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const loadWaline = (el, path) => {
+    if (initFn) initWaline(initFn, el, path)
+    else {
+      btf.getCSS('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.css')
+        .then(() => import('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.js'))
+        .then(({ init }) => {
+          initFn = init || Waline.init
+          initWaline(initFn, el, path)
+          window.walineFn = initFn
+        })
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Waline'
+      ? window.shuoshuoComment = { loadComment: loadWaline } 
+      : window.loadOtherComment = loadWaline
+    return
+  }
+
+  if ('Waline' === 'Waline' || !true) {
+    if (true) btf.loadComment(document.getElementById('waline-wrap'),loadWaline)
+    else setTimeout(loadWaline, 0)
+  } else {
+    window.loadOtherComment = loadWaline
+  }
+})()</script><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = {"placeholder":"留下你的足迹o(*￣▽￣*)ブ"}
+
+  const initValine = (el, path) => {
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyValine = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+
+    const valineConfig = {
+      el: '#vcomment',
+      appId: 'UiqS9a0n4lJdFRrqPbrgjpbS-MdYXbMMI',
+      appKey: 'NkeAhjIM8aY4DBSeOIzuQ1qQ',
+      avatar: 'hide',
+      serverURLs: 'https://uiqs9a0n.api.lncldglobal.com',
+      emojiMaps: "",
+      visitor: true,
+      ...option,
+      path: isShuoshuo ? path : (option && option.path) || window.location.pathname
+    }
+
+    new Valine(valineConfig)
+  }
+
+  const loadValine = async (el, path) => {
+    if (typeof Valine === 'function') {
+      initValine(el, path)
+    } else {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine(el, path)
+    }
+  }
+
+  if (isShuoshuo) {
+    'Waline' === 'Valine'
+      ? window.shuoshuoComment = { loadComment: loadValine }
+      : window.loadOtherComment = loadValine
+    return
+  }
+
+  if ('Waline' === 'Valine' || !true) {
+    if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="输入你想找的关键字吧~" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
