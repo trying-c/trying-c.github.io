@@ -71,10 +71,10 @@
   resolved "https://registry.npmjs.org/@csstools/css-tokenizer/-/css-tokenizer-3.0.3.tgz"
   integrity sha512-UJnjoFsmxfKUdNYdWgOB0mWUypuLvAfQPH1+pyvRJs6euowbFkFC6P13w1l8mJyi3vxYMxc9kld5jZEGRQs6bw==
 
-"@notionhq/client@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.npmmirror.com/@notionhq/client/-/client-4.0.2.tgz#d03b82ed7bae0e4025358f0cdb6c3a29afd32a67"
-  integrity sha512-4pk3dm4umhjsRI0umCnJ8lCZh0TMiaMdkY0rz6FV4OqVuTsmYFV3pk+YTR5S8792ZY2Rm4lJHlLj05HQVKDuIg==
+"@notionhq/client@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@notionhq/client/-/client-5.4.0.tgz#5f10af391730c1755dd7b821298287117aff73f3"
+  integrity sha512-SJsprS26S0Wi9CoTQp4vC8/nPpAIo1gMB4H7aJ2E/k0fWnNGIEAg984KwtzK6h9ZGaPcEaryVRSz1VVClJcVUw==
 
 "@types/trusted-types@^2.0.7":
   version "2.0.7"
