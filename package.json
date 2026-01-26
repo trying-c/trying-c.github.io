@@ -12,7 +12,7 @@
     "version": "7.3.0"
   },
   "dependencies": {
-    "@notionhq/client": "^4.0.2",
+    "@notionhq/client": "^5.8.0",
     "dotenv": "^17.2.1",
     "hexo": "^7.3.0",
     "hexo-abbrlink": "^2.2.1",
