@@ -26,12 +26,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Sync Notion to Hexo
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        run: node sync.js
-
       - name: Install Hexo Git Deployer
         run: |
           npm install hexo-deployer-git --save
