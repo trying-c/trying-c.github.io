@@ -61,8 +61,8 @@ social:
 # 是否禁用顶部图片
 disable_top_img: true
 # 主页的 top_img
-# index_img: "/assets/imgs/index.jpg"
-index_img: "/assets/imgs/bg.png"
+index_img: "/assets/imgs/index.jpg"
+# index_img: "/assets/imgs/bg.png"
 # 默认的 top_img，当页面的 top_img 没有配置时，会显示 default_top_img
 default_top_img: "/assets/imgs/tags.jpg"
 # 归档页面的 top_img
@@ -81,7 +81,7 @@ footer_img: true
 # 颜色（HEX值/RGB值/顔色单词/渐变色)
 # 留空 不显示背景
 # background: "rgb(237 255 237 / 81%)"
-background: "/assets/imgs/bg.png"
+background: "/assets/imgs/index.jpg"
 # -------------------------------------------------------------------------
 cover:
   # 主页是否显示文章封面图
